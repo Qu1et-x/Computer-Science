@@ -252,30 +252,81 @@ function foodCounterTimer(newFood) {
     }, 25);
 }
 
-function updateStats() {
-    /* Called on interval. Ask server for food count and turn count */
+// function updateStats() {
+//     /* Called on interval. Ask server for food count and turn count */
 
-    fetch('/update_stats') // Triger update_stats signal in server
-    .then(response => response.json())
-    .then(data => { // Handle data from server
+//     fetch('/update_stats') // Triger update_stats signal in server
+//     .then(response => response.json())
+//     .then(data => { // Handle data from server
 
-        setTimeout(() => { // Use time out to avoid crashes
-            let food = data.food;
-            let turn = data.turn;
+//         setTimeout(() => { // Use time out to avoid crashes
+//             let food = data.food;
+//             let turn = data.turn;
+//             if (!alreadyUpdatingFoodCounter) {
+//                 alreadyUpdatingFoodCounter = true;
+//                 foodCounterTimer(food);
+//             }
+//             food_display = document.querySelector('.display-turn-div');
+//             food_display.innerText = `Turn: ${turn}`;
+//             adjustAntButtons(data.available_ants); // Update GUI on what ants are available
+//         }, 50);
+//     })
+
+//     .catch(error => {
+//         console.error('Error:', error);
+//     });
+// }
+
+// 上面的太卡顿了，下面是尝试优化的版本
+
+// 缓存DOM元素 & 状态变量
+const foodDisplay = document.querySelector('.display-turn-div');
+let lastFood = null;
+let lastTurn = null;
+let lastAvailableAnts = null;
+
+// 节流控制请求频率（每1秒最多1次）
+function throttle(func, limit) {
+    let lastRun = 0;
+    return function() {
+        const now = Date.now();
+        if (now - lastRun >= limit) {
+            func.apply(this, arguments);
+            lastRun = now;
+        }
+    };
+}
+
+// 优化后的主函数
+const updateStats = throttle(() => {
+    fetch('/update_stats')
+        .then(response => response.json())
+        .then(data => {
+            // 1. 数据无变化时跳过更新
+            if (data.food === lastFood && data.turn === lastTurn && 
+                JSON.stringify(data.available_ants) === JSON.stringify(lastAvailableAnts)) {
+                return;
+            }
+
+            // 2. 直接更新避免setTimeout延迟
+            lastFood = data.food;
+            lastTurn = data.turn;
+            lastAvailableAnts = data.available_ants;
+
+            // 3. 条件执行避免重复动画
             if (!alreadyUpdatingFoodCounter) {
                 alreadyUpdatingFoodCounter = true;
-                foodCounterTimer(food);
+                foodCounterTimer(data.food);
             }
-            food_display = document.querySelector('.display-turn-div');
-            food_display.innerText = `Turn: ${turn}`;
-            adjustAntButtons(data.available_ants); // Update GUI on what ants are available
-        }, 50);
-    })
 
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
+            // 4. 更新DOM（已缓存元素）
+            foodDisplay.innerText = `Turn: ${data.turn}`;
+            adjustAntButtons(data.available_ants);
+        })
+        .catch(error => console.error('Update stats error:', error));
+}, 1000); // 限制每秒最多1次请求
+
+// 修改到这里结束
 
 function createHealthBarIfNeeded(data) {
     let insect = document.getElementById(data.insect_id);

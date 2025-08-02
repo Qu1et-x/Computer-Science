@@ -27,7 +27,7 @@ class Place:
         # Phase 1: Add an entrance to the exit
         # BEGIN Problem 2
         "*** YOUR CODE HERE ***"
-        if self.exit != None:
+        if self.exit is not None:
             self.exit.entrance = self
         # END Problem 2
 
@@ -151,13 +151,13 @@ class Ant(Insect):
         # BEGIN Problem 12
         "*** YOUR CODE HERE ***"
         next = self.place
-        while next.exit != None: 
-            if next.exit.ant != None:
+        while next.exit is not None: 
+            if next.exit.ant is not None:
                 ant = next.exit.ant
                 if not ant.is_double:
                     ant.damage *= 2
                     ant.is_double = True
-                if ant.is_container and ant.ant_contained != None and not ant.ant_contained.is_double:
+                if ant.is_container and ant.ant_contained is not None and not ant.ant_contained.is_double:
                     ant.ant_contained.damage *= 2
                     ant.ant_contained.is_double = True
             next = next.exit
@@ -203,7 +203,7 @@ class ThrowerAnt(Ant):
         # BEGIN Problem 3 and 4
         index = 0
         next = self.place
-        while next.entrance != None:
+        while next.entrance is not None:
             if index < self.lower_bound:
                 index += 1
                 next = next.entrance
@@ -341,7 +341,7 @@ class ContainerAnt(Ant):
     def can_contain(self, other):
         # BEGIN Problem 8a
         "*** YOUR CODE HERE ***"
-        if self.ant_contained == None and other.is_container == False:
+        if self.ant_contained is None and other.is_container is False:
             return True
         else:
             return False
@@ -350,7 +350,7 @@ class ContainerAnt(Ant):
     def store_ant(self, ant):
         # BEGIN Problem 8a
         "*** YOUR CODE HERE ***"
-        if self.can_contain(ant) == True:
+        if self.can_contain(ant):
             self.ant_contained = ant
         # END Problem 8a
 
@@ -372,7 +372,7 @@ class ContainerAnt(Ant):
     def action(self, gamestate):
         # BEGIN Problem 8a
         "*** YOUR CODE HERE ***"
-        if self.ant_contained != None:
+        if self.ant_contained is not None:
             self.ant_contained.action(gamestate)
         # END Problem 8a
 
@@ -476,11 +476,28 @@ class SlowThrower(ThrowerAnt):
     food_cost = 6
     # BEGIN Problem EC 1
     implemented = True   # Change to True to view in the GUI
+    slow_turn = 5
     # END Problem EC 1
 
     def throw_at(self, target):
         # BEGIN Problem EC 1
         "*** YOUR CODE HERE ***"
+        # 这个类的实现没有修改除了这个类之外的其他地方
+        if target is not None:
+            if not hasattr(target, 'slow_effect'):
+                target.slow_effect = self.slow_turn
+                def slow_action(gamestate):
+                    if target.slow_effect > 0:
+                        if gamestate.time % 2 == 0:
+                            target.slow_effect -= 1
+                            Bee.action(target, gamestate)
+                        else:
+                            target.slow_effect -= 1
+                    else:
+                        Bee.action(target, gamestate)
+                target.action = slow_action
+            else:
+                target.slow_effect = self.slow_turn
         # END Problem EC 1
 
 
@@ -490,12 +507,16 @@ class ScaryThrower(ThrowerAnt):
     name = 'Scary'
     food_cost = 6
     # BEGIN Problem EC 2
-    implemented = False   # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
+    scary_turn = 2
     # END Problem EC 2
 
     def throw_at(self, target):
         # BEGIN Problem EC 2
         "*** YOUR CODE HERE ***"
+        # 这个类的实现修改了Bee类的类属性和action方法
+        if target is not None:
+            target.scare(self.scary_turn)
         # END Problem EC 2
 
 
@@ -565,6 +586,7 @@ class Bee(Insect):
     name = 'Bee'
     damage = 1
     is_waterproof = True
+    is_forward = True
 
 
     def sting(self, ant):
@@ -594,6 +616,15 @@ class Bee(Insect):
         """
         destination = self.place.exit
 
+        if hasattr(self, 'scary_effect'):
+            if self.scary_effect > 0:
+                self.scary_effect -= 1
+                self.is_forward = False
+            else:
+                self.is_forward = True
+
+        if not self.is_forward:
+            destination = self.place.entrance
 
         if self.blocked():
             self.sting(self.place.ant)
@@ -615,6 +646,8 @@ class Bee(Insect):
         """
         # BEGIN Problem EC 2
         "*** YOUR CODE HERE ***"
+        if not hasattr(self, 'scary_effect'):
+            self.scary_effect = length
         # END Problem EC 2
 
 
