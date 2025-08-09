@@ -55,7 +55,7 @@ def interleaved_sum(n, f_odd, f_even):
     True
     """
     "*** YOUR CODE HERE ***"
-    #实际上有更好、分工更明确的实现，这里只是为了保留我的第一手想法
+    # 实际上有更好、分工更明确的实现，这里只是为了保留我的第一手想法
     def g(k):
         if k == n:
             result = f_odd(k)
@@ -156,6 +156,7 @@ def merge(s, t):
     True
     """
     "*** YOUR CODE HERE ***"
+    # 这里的前两个if其实可以优化
     if s == []:
         return t
     elif t == []:

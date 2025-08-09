@@ -5,5 +5,6 @@ def twenty_twenty_five():
     >>> twenty_twenty_five()
     2025
     """
-    return ______
+    # 后来才发现这里居然还有一道题目
+    return 5 ** 5 - 11 * 10 * 10
 

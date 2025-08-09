@@ -11,6 +11,7 @@ def falling(n, k):
     1
     """
     "*** YOUR CODE HERE ***"
+    # 后来发现其他的逻辑有可以优化掉if的方案
     if k == 0:
         return 1
     total = 1
@@ -68,6 +69,7 @@ def double_eights(n):
     False
     """
     "*** YOUR CODE HERE ***"
+    # 回头看发现有更聪明的逻辑...
     a = n // 10
     b = n % 10
     c = a % 10
@@ -93,6 +95,7 @@ def two_of_three(i, j, k):
     >>> two_of_three(5, 5, 5)
     50
     """
+    # 当时的自己真的很愚蠢...写这么长一串
     return min(i,j,k) * min(i,j,k) + ((i + j + k) - min(i,j,k) - max(i,j,k)) * ((i + j + k) - min(i,j,k) - max(i,j,k))
 
 def two_of_three_syntax_check():
@@ -135,6 +138,7 @@ def largest_factor(n):
     1
     """
     "*** YOUR CODE HERE ***"
+    # 这里从按照大到小处理会更快，毕竟要找的是最大因数
     result = 1
     while result < n:
         if n % result == 0:
@@ -153,13 +157,8 @@ def multiple(a, b):
     """
     "*** YOUR CODE HERE ***"
     n = 1
-    a_min = a * n
-    while n <= b:
-        m = 1
-        b_min = b * m
-        while m <= a:
-            if a * n == b * m:
-                return a * n
-            m += 1
+    while True:
+        if n % a == 0 and n % b == 0:
+            return n
         n += 1
 
