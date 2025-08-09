@@ -139,6 +139,7 @@ def composite_identity(f, g):
     False
     """
     "*** YOUR CODE HERE ***"
+    # 这里完全可以用lambda关键字来一句话就写完
     def h(x):
         if f(g(x)) == g(f(x)):
             return True

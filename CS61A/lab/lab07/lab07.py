@@ -31,7 +31,7 @@ def has_path(t, target):
     assert len(target) > 0, 'no path for empty target.'
     "*** YOUR CODE HERE ***"
     # 基本情况
-    if t.label == target or target == '':
+    if t.label == target:
         return True
     elif t.label != target[0]:
         return False
@@ -128,7 +128,7 @@ def slice_link(link, start, end):
     elif start > 0:
         return slice_link(link.rest, start-1, end-1)
     else:
-        return Link(link.first, slice_link(link.rest, start-1, end-1))
+        return Link(link.first, slice_link(link.rest, 0, end-1))
 
 
 def level_mutation_link(t, funcs):
