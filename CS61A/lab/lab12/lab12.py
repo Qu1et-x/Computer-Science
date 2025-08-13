@@ -371,6 +371,9 @@ def every_other(s):
     Link(4)
     """
     "*** YOUR CODE HERE ***"
+    if s is not Link.empty and s.rest is not Link.empty:
+        s.rest = s.rest.rest
+        every_other(s.rest)
 
 
 def pascal_row(s):
@@ -386,6 +389,15 @@ def pascal_row(s):
     <1 4 6 4 1>
     """
     "*** YOUR CODE HERE ***"
+    result = Link(1)
+    while s is not Link.empty:
+        if s.rest is Link.empty:
+            result = Link(s.first, result)
+        else:
+            result = Link(s.first + s.rest.first, result)
+        s = s.rest
+    return result
+            
 
 
 class Link:
