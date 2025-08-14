@@ -28,8 +28,6 @@ node *table[N];
 bool check(const char *word)
 {
     // TODO
-    // 助教的算法速度太快了，初始版本的首字母哈希也能过
-    // 但是过的不爽，所以现在改用了DJB2算法
     node *cursor = table[hash(word)];
     while (cursor != NULL)
     {
